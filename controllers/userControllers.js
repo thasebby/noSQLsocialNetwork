@@ -32,7 +32,7 @@ module.exports = {
     },
     updateUser: async (req, res) => {
         try {
-            const userData = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            const userData = await User.findByIdAndUpdate(req.params.userId, req.body, { new: true });
             if (!userData) {
                 return res.status(404).json({ message: 'User not found' });
             }
@@ -46,7 +46,7 @@ module.exports = {
     },
     deleteUser: async (req,res) => {
         try{
-            const userData = await User.findByIdAndDelete(req.params.id);
+            const userData = await User.findByIdAndDelete(req.params.userId);
 
             if (!userData) {
                 return res.status(404).json({ message: 'User not found' });
@@ -80,9 +80,9 @@ module.exports = {
     },
     deleteFriend: async (req,res) => {
         try{
-            const userData = await User.findOneAndRemove(
+            const userData = await User.findOneAndUpdate(
                 { _id: req.params.userId },
-                { $pull: { friends: {friendId: req.params.friendId } } },
+                { $pull: { friends: req.params.friendId } },
                 { runValidators: true, new: true},
             );
 
@@ -91,7 +91,7 @@ module.exports = {
             }
             
             // check if friend was removed
-            const friendRemoved = !userData.friends.includes(req.params.friendId);
+            const friendRemoved = !userData.friends.some(friend => friend.friendId === req.params.friendId);
 
             if(friendRemoved) {
                 res.json({ message: 'Friend removed', userData});

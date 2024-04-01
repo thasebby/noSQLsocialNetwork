@@ -82,7 +82,7 @@ module.exports={
     },
     deleteReaction: async (req,res) => {
         try{
-            const thoughtsData = await Thought.findOneAndRemove(
+            const thoughtsData = await Thought.findOneAndUpdate(
                 {_id: req.params.thoughtId},
                 {$pull: {reactions: { reactionId: req.params.reactionId } } },
                 {runValidators: true, new: true},
@@ -93,7 +93,7 @@ module.exports={
             }
 
             // check if reaction was removed
-            const reactionRemoved = !userData.reactions.includes(req.params.reactionId);
+            const reactionRemoved = !thoughtsData.reactions.some(reaction => reaction.reactionId === req.params.reactionId);
 
             if(reactionRemoved) {
                 res.json({ message: 'Reaction removed', thoughtsData});
