@@ -32,11 +32,13 @@ module.exports = {
     },
     updateUser: async (req, res) => {
         try {
-            const userData = await User.findOneAndUpdate(req.params.id, req.body, { new: true });
+            const userData = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
             if (!userData) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            res.json(userData);
+            else{
+                res.json(userData);
+            }
         }
         catch (err) {
             res.status(500).json(err);
@@ -44,11 +46,14 @@ module.exports = {
     },
     deleteUser: async (req,res) => {
         try{
-            const userData = await User.findOneAndDelete(req.params.id);
+            const userData = await User.findByIdAndDelete(req.params.id);
+
             if (!userData) {
                 return res.status(404).json({ message: 'User not found' });
             }
-            res.json(userData);
+            else{
+                res.json(userData);
+            }
         }
         catch (err) {
             res.status(500).json(err);
@@ -56,7 +61,7 @@ module.exports = {
     },
     addNewFriend: async (req,res) => {
         try{
-            const userData = await User.findOneAndUpdate(
+            const userData = await User.findByIdAndUpdate(
                 { _id: req.params.userId },
                 { $addToSet: {friends: req.body.friendId} },
                 { runValidators: true, new: true }
@@ -65,8 +70,9 @@ module.exports = {
             if(!userData) {
                 res.status(404).json({ message: 'User not found'});
             }
-
-            res.json(userData);
+            else{
+                res.json(userData);
+            }
         }
         catch (err) {
             res.status(500).json(err);
@@ -76,8 +82,8 @@ module.exports = {
         try{
             const userData = await User.findOneAndRemove(
                 { _id: req.params.userId },
-                { $pull: { friends: req.params.friendId } },
-                { new: true}
+                { $pull: { friends: {friendId: req.params.friendId } } },
+                { runValidators: true, new: true},
             );
 
             if(!userData) {
